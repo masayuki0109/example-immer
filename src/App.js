@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import produce from "immer";
 
 function App() {
+  const initTodo = [
+    { id: 1, title: "React勉強会の資料作成", isDone: false },
+    { id: 2, title: "React勉強会でプレゼンする", isDone: false },
+  ];
+  const [todo, setTodo] = useState(initTodo);
+
+  const changeIsDone = (index) => {
+    setTodo((prev) => {
+      const next = prev.map((todo, i) => {
+        if (i !== index) return todo;
+        return {
+          ...todo,
+          isDone: !todo.isDone,
+        };
+      });
+      return next;
+    });
+  };
+
+  const immerChangeIsDone = (index) => {
+    setTodo((prev) =>
+      produce(prev, (draft) => {
+        draft[index].isDone = !prev[index].isDone;
+      })
+    );
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ul>
+      {todo.map((todo, index) => (
+        <li key={index}>
+          {todo.title} {todo.isDone ? "完了" : "未完了"}
+          <button onClick={() => changeIsDone(index)}>変更</button>
+          {/* <button onClick={() => immerChangeIsDone(index)}>変更</button> */}
+        </li>
+      ))}
+    </ul>
   );
 }
 
